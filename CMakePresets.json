@@ -1,0 +1,33 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 4,
+    "minor": 2,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "windows-vs2026-base",
+      "hidden": true,
+      "displayName": "VS 2026 x64 - MSVC 14.51 / SDK 26100",
+      "generator": "Visual Studio 18 2026",
+      "architecture": {
+        "value": "x64,version=10.0.26100.0",
+        "strategy": "set"
+      },
+      "toolset": {
+        "value": "v145,version=14.51",
+        "strategy": "set"
+      },
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": {
+          "type": "FILEPATH",
+          "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        },
+        "VCPKG_TARGET_TRIPLET": "x64-windows-v145-1451",
+        "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/cmake/triplets"
+      }
+    }
+  ]
+}

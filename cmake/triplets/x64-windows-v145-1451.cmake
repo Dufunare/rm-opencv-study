@@ -1,0 +1,7 @@
+# Consistent compiler, Windows SDK and CRT selection on both Windows PCs.
+set(VCPKG_TARGET_ARCHITECTURE x64)
+set(VCPKG_CRT_LINKAGE dynamic)
+set(VCPKG_LIBRARY_LINKAGE dynamic)
+set(VCPKG_PLATFORM_TOOLSET v145)
+set(VCPKG_PLATFORM_TOOLSET_VERSION "14.51")
+set(VCPKG_CMAKE_SYSTEM_VERSION "10.0.26100.0")

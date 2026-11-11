@@ -1,0 +1,15 @@
+# Per-machine CMake/vcpkg locations; never commit this file.
+CMakeUserPresets.json
+
+# Generated output and local IDE state
+out/
+demo_output/
+.vs/
+.vscode/
+CMakeFiles/
+CMakeCache.txt
+vcpkg_installed/
+*.user
+*.VC.db
+*.VC.opendb
+*.suo
