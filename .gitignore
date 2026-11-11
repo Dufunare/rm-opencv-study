@@ -13,3 +13,18 @@ vcpkg_installed/
 *.VC.db
 *.VC.opendb
 *.suo
+
+# Local datasets and recordings
+/datas/samples/
+/datas/videos/
+/datas/raw/
+/datas/downloads/
+
+# Python environments and caches
+/datas/.venv/
+__pycache__/
+*.pyc
+
+# Hugging Face / generated files
+/datas/.cache/
+/datas/.hf_cache/
