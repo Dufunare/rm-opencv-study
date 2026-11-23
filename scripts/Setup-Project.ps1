@@ -1,4 +1,4 @@
-# Project setup using the vcpkg bundled with Visual Studio 2026.
+﻿# Project setup using the vcpkg bundled with Visual Studio 2026.
 # No git clone, no vcpkg bootstrap, no global PATH changes.
 param(
     [string]$VcpkgRoot = '',
@@ -26,8 +26,27 @@ if (-not $vsPath) { throw 'Visual Studio 2026 with MSVC tools was not found.' }
 $toolDir = Join-Path $vsPath 'VC\Tools\MSVC'
 $msvc = @(Get-ChildItem $toolDir -Directory -ErrorAction SilentlyContinue | Where-Object { $_.Name -like '14.51.*' })
 if ($msvc.Count -eq 0) { throw 'MSVC 14.51 is missing. Install it side-by-side using Visual Studio Installer.' }
-$sdk = Join-Path $pf86 'Windows Kits\10\Include\10.0.26100.0'
-if (-not (Test-Path $sdk)) { throw 'Windows SDK 10.0.26100.0 is missing.' }
+# Windows SDK may live on a different drive. Resolve its registered installation root.
+$sdkVersion = '10.0.26100.0'
+$sdkRoots = @()
+foreach ($key in @(
+    'HKLM:\SOFTWARE\Microsoft\Windows Kits\Installed Roots',
+    'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows Kits\Installed Roots'
+)) {
+    $entry = Get-ItemProperty -Path $key -ErrorAction SilentlyContinue
+    if ($entry -and $entry.KitsRoot10) { $sdkRoots += [string]$entry.KitsRoot10 }
+}
+$sdkRoots += (Join-Path $pf86 'Windows Kits\10')
+$sdkRoot = $null
+foreach ($root in ($sdkRoots | Where-Object { $_ } | Select-Object -Unique)) {
+    if ((Test-Path (Join-Path $root "Include\$sdkVersion")) -and
+        (Test-Path (Join-Path $root "Lib\$sdkVersion")) -and
+        (Test-Path (Join-Path $root "bin\$sdkVersion"))) {
+        $sdkRoot = $root
+        break
+    }
+}
+if (-not $sdkRoot) { throw "Windows SDK $sdkVersion was not found in registered or default Windows Kits locations." }
 $cmake = Join-Path $vsPath 'Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe'
 if (-not (Test-Path $cmake)) { throw 'Visual Studio 2026 CMake is missing.' }
 
@@ -42,7 +61,7 @@ if (-not (Test-Path $vcpkgCmake)) {
 
 Write-Host ('VS: ' + $vsPath)
 Write-Host ('MSVC: ' + ($msvc.Name -join ', '))
-Write-Host 'SDK: 10.0.26100.0'
+Write-Host ("SDK: {0} ({1})" -f $sdkVersion, $sdkRoot)
 Write-Host ('CMake: ' + ((& $cmake --version | Select-Object -First 1) -join ''))
 Write-Host ('vcpkg: ' + $vcpkgExe)
 Invoke-Checked $vcpkgExe @('version')

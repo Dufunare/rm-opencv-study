@@ -1,4 +1,4 @@
-# Read-only diagnostic for a desktop or laptop. Compatible with Windows PowerShell 5.1.
+﻿# Read-only diagnostic for a desktop or laptop. Compatible with Windows PowerShell 5.1.
 $ErrorActionPreference = 'Continue'
 Write-Host '=== Windows / PowerShell ==='
 Write-Host ("OS: " + [Environment]::OSVersion.VersionString)
@@ -50,11 +50,29 @@ if (Test-Path $vswhere) {
 }
 
 Write-Host "`n=== Windows SDK include versions ==="
-$sdkRoot = Join-Path $pf86 'Windows Kits\10\Include'
-if (Test-Path $sdkRoot) {
-    Get-ChildItem $sdkRoot -Directory -ErrorAction SilentlyContinue |
-        Select-Object -ExpandProperty Name | ForEach-Object { Write-Host $_ }
-} else { Write-Host 'Windows Kits 10 Include directory not found' }
+$sdkRoots = @()
+foreach ($key in @(
+    'HKLM:\SOFTWARE\Microsoft\Windows Kits\Installed Roots',
+    'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows Kits\Installed Roots'
+)) {
+    $entry = Get-ItemProperty -Path $key -ErrorAction SilentlyContinue
+    if ($entry -and $entry.KitsRoot10) { $sdkRoots += [string]$entry.KitsRoot10 }
+}
+$sdkRoots += (Join-Path $pf86 'Windows Kits\10')
+$foundSdk = $false
+foreach ($root in ($sdkRoots | Where-Object { $_ } | Select-Object -Unique)) {
+    $includeDir = Join-Path $root 'Include'
+    if (-not (Test-Path $includeDir)) { continue }
+    $foundSdk = $true
+    Write-Host ("SDK root: " + $root)
+    foreach ($version in @(Get-ChildItem $includeDir -Directory -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name)) {
+        $hasLib = Test-Path (Join-Path $root "Lib\$version")
+        $hasBin = Test-Path (Join-Path $root "bin\$version")
+        Write-Host ("  {0} (Lib={1}; bin={2})" -f $version, $hasLib, $hasBin)
+    }
+    break
+}
+if (-not $foundSdk) { Write-Host 'Windows Kits 10 Include directory not found via registry or default location' }
 
 Write-Host "`n=== Local OpenCV/vcpkg pointers (no global changes) ==="
 if ($env:VCPKG_ROOT) { Write-Host ("VCPKG_ROOT: " + $env:VCPKG_ROOT) }
