@@ -1,8 +1,7 @@
 [project]
 name = "datas"
 version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
+description = "Dataset preparation and evaluation for the OpenCV study"
 authors = [
     { name = "ChenyuDu", email = "Funare2022@gmail.com" }
 ]
@@ -13,9 +12,5 @@ dependencies = [
     "requests>=2.34.2",
 ]
 
-[project.scripts]
-datas = "datas:main"
-
-[build-system]
-requires = ["uv_build>=0.13.7,<0.14.0"]
-build-backend = "uv_build"
+[tool.uv]
+package = false

@@ -1,19 +1,20 @@
+import argparse
 import json
 import random
 import tarfile
 from pathlib import Path
 
-from huggingface_hub import hf_hub_download
+from prepare_stickers import resolve_shard
 
-# 只查询本地缓存，不进行网络下载
-archive_path = hf_hub_download(
-    repo_id="rmcv/armor",
-    filename="data/mixed_armor/train/mixed_armor-train-00000.tar",
-    repo_type="dataset",
-    local_files_only=True,
-)
+parser = argparse.ArgumentParser(description="Extract the fixed 20-image rmcv/armor sample.")
+parser.add_argument("--out", type=Path, default=Path(__file__).parent / "samples/mixed_armor")
+archive_arg = parser.add_mutually_exclusive_group()
+archive_arg.add_argument("--archive", type=Path)
+archive_arg.add_argument("--download", action="store_true")
+args = parser.parse_args()
+archive_path = resolve_shard(args.archive, args.download)
 
-output_dir = Path("samples/mixed_armor")
+output_dir = args.out
 output_dir.mkdir(parents=True, exist_ok=True)
 
 with tarfile.open(archive_path, "r:*") as tar:
