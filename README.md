@@ -1,6 +1,17 @@
 # RoboMaster OpenCV study — C++ / Visual Studio 2026
 
-A small shared repository for a desktop PC and a laptop. It is a learning project, not a competition-ready auto-aim implementation.
+`armor_study` reads recorded images and videos, labels red and blue plates, estimates pose, and compares constant-velocity forecasts with later video observations. [考核演示与答辩说明](docs/ASSESSMENT.md) covers the run commands, results, camera assumptions, and YOLO Pose experiment.
+
+From the repository root, run the Release executable on the prepared materials:
+
+```powershell
+$study = '.\out\build\windows-vs2026-x64\Release\armor_study.exe'
+& $study --self-test
+& $study --image datas/samples/mixed_armor/mixed_armor_000261.jpg --out demo_output/assessment/image
+& $study --video 'datas/videos/远距离平移.avi' --forecast-frames 3 --max-frames 450 --out demo_output/assessment/far
+```
+
+These commands expect `out/models/stickers.yml.gz`. The assessment guide includes the `uv` and OpenCV commands to rebuild it from the pinned dataset.
 
 ## Project baseline
 
@@ -64,9 +75,9 @@ Commit source, presets, manifests and docs. Do not commit generated `CMakeUserPr
 Visual Studio: **File -> Open -> Folder**, select repository root, then CMake preset `windows-vs2026-x64`.
 VS Code: install Microsoft **C/C++** and **CMake Tools** extensions and select the same preset. For command-line builds, VS bundled CMake is used even when `cmake` is not on PATH.
 
-## Demo scope
+## Synthetic build smoke test
 
-Generates a synthetic BGR image with two blue light bars and a white number 3; uses blue-minus-red channel difference, threshold, findContours and minAreaRect to draw candidate boxes. This is a smoke test, not full armor matching, number classification, PnP or motion prediction.
+`armor_demo` generates a synthetic BGR image with two blue light bars and a white number 3. It uses blue-minus-red channel difference, thresholding, `findContours` and `minAreaRect` to verify the build without media or a model. The assessment entry point is `armor_study`.
 
 ## Sources
 
