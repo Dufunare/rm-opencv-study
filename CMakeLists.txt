@@ -12,13 +12,19 @@ find_package(OpenCV 4.14.0 EXACT REQUIRED COMPONENTS
     imgcodecs
     highgui
     calib3d
+    objdetect
+    videoio
 )
 
 add_executable(armor_demo src/main.cpp)
 target_link_libraries(armor_demo PRIVATE ${OpenCV_LIBS})
 
+add_executable(armor_study src/study.cpp src/detector.cpp src/pose.cpp)
+target_link_libraries(armor_study PRIVATE ${OpenCV_LIBS})
+
 if(MSVC)
     target_compile_options(armor_demo PRIVATE /W4 /permissive- /utf-8)
+    target_compile_options(armor_study PRIVATE /W4 /permissive- /utf-8)
 endif()
 
 message(STATUS "Project OpenCV: ${OpenCV_VERSION}")

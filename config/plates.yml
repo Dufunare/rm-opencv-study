@@ -1,0 +1,10 @@
+%YAML:1.0
+---
+# Working light geometry for unmeasured media. Replace with measurements from
+# the actual plate when available. Width is between light centerlines.
+small:
+   light_center_spacing_mm: 132.0
+   light_length_mm: 55.0
+large:
+   light_center_spacing_mm: 225.0
+   light_length_mm: 55.0
