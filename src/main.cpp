@@ -8,7 +8,8 @@
 #include <string_view>
 #include <vector>
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[])
+{
     const bool noGui = (argc > 1 && std::string_view(argv[1]) == "--no-gui");
     std::cout << "OpenCV version: " << CV_VERSION << '\n';
 
@@ -33,26 +34,31 @@ int main(int argc, char* argv[]) {
 
     cv::Mat annotated = image.clone();
     int lightBars = 0;
-    for (const auto& contour : contours) {
-        if (cv::contourArea(contour) < 100.0) {
+    std::vector<std::vector<cv::Point>> filteredContours;
+    for (const auto &contour : contours)
+    {
+        if (cv::contourArea(contour) < 100.0)
+        {
             continue;
         }
         const auto rect = cv::minAreaRect(contour);
         const float small = std::min(rect.size.width, rect.size.height);
         const float large = std::max(rect.size.width, rect.size.height);
-        if (small < 1.0f || large / small < 3.0f) {
+        if (small < 1.0f || large / small < 3.0f)
+        {
             continue;
         }
         cv::Point2f cornersF[4];
         rect.points(cornersF);
         std::vector<cv::Point> corners;
-        for (const auto& pt : cornersF) {
+        for (const auto &pt : cornersF)
+        {
             corners.emplace_back(cvRound(pt.x), cvRound(pt.y));
         }
-        cv::polylines(annotated, std::vector<std::vector<cv::Point>>{corners}, true,
-                      cv::Scalar(0, 255, 0), 2);
+        filteredContours.push_back(corners);
         ++lightBars;
     }
+    cv::polylines(annotated, filteredContours, true, cv::Scalar(0, 255, 0), 2);
 
     const std::filesystem::path outDir = "demo_output";
     std::filesystem::create_directories(outDir);
@@ -63,13 +69,15 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Light-bar candidates: " << lightBars << '\n';
     std::cout << "Images: " << std::filesystem::absolute(outDir).string() << '\n';
-    if (!saved || lightBars != 2) {
+    if (!saved || lightBars != 2)
+    {
         std::cerr << "DEMO FAIL: expected two candidates and three saved images.\n";
         return 1;
     }
     std::cout << "DEMO PASS: two synthetic blue light bars detected.\n";
 
-    if (!noGui) {
+    if (!noGui)
+    {
         cv::imshow("source", image);
         cv::imshow("mask", mask);
         cv::imshow("detected", annotated);
